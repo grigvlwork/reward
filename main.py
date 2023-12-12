@@ -90,6 +90,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.correct_code_model = QStandardItemModel()
+        self.explanation_pte.textChanged.connect(self.explanation_changed)
+        self.run_btn.clicked.connect(self.run_correct)
+        self.toggle_theme_btn.clicked.connect(self.change_theme)
 
     def check_version(self):
         v = None
