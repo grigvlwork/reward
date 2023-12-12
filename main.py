@@ -59,6 +59,8 @@ def spell_check(text):
             if len(word) > 0:
                 words.append(word)
                 word = ''
+    if len(word) > 0 and word not in words:
+        words.append(word)
     result = []
     dictionary = enchant.Dict("ru_RU")
     for w in words:
@@ -95,7 +97,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.explanation_text = ''
         self.answer_number = 0
-        self.rb0.setChecked(True)
         self.allow_spell_check = check_dict()
         self.correct_code_model = QStandardItemModel()
         self.explanation_pte.textChanged.connect(self.explanation_changed)
@@ -171,16 +172,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             except Exception:
                 pass
 
-    def get_answer_number(self):
-        if self.rb0.isChecked():
-            return 0
-        elif self.rb1.isChecked():
-            return 1
-        return 2
-
     def explanation_changed(self):
         self.explanation_text = self.explanation_pte.toPlainText()
-        self.answer_number = self.get_answer_number()
         self.set_my_answer()
 
     def pep8_correct(self):
@@ -227,13 +220,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     def paste_explanation(self):
         self.explanation_pte.clear()
-        self.answer_number = 0
         self.explanation_pte.appendPlainText(pyperclip.paste())
-        self.rb0.setChecked(True)
-
-    def answer_number_change(self):
-        self.answer_number = int(self.sender().text())
-        self.set_my_answer()
 
     def set_my_answer(self):
         self.my_answer_pte.setPlainText(str(self.answer_number) + '\n<comment>\n' + self.explanation_text +
