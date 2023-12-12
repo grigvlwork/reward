@@ -164,7 +164,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addLayout(self.verticalLayout)
         self.verticalLayout_3.addLayout(self.horizontalLayout_6)
         self.correct_output_lb = QtWidgets.QLabel(self.centralwidget)
-        self.correct_output_lb.setMaximumSize(QtCore.QSize(1200, 50))
+        self.correct_output_lb.setMaximumSize(QtCore.QSize(1200, 200))
         self.correct_output_lb.setObjectName("correct_output_lb")
         self.verticalLayout_3.addWidget(self.correct_output_lb)
         MainWindow.setCentralWidget(self.centralwidget)

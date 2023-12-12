@@ -101,15 +101,13 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.correct_code_model = QStandardItemModel()
         self.explanation_pte.textChanged.connect(self.explanation_changed)
         self.run_btn.clicked.connect(self.run_correct)
-        self.rb0.clicked.connect(self.answer_number_change)
-        self.rb1.clicked.connect(self.answer_number_change)
-        self.rb2.clicked.connect(self.answer_number_change)
         self.toggle_theme_btn.clicked.connect(self.change_theme)
         self.pep8_btn.clicked.connect(self.pep8_correct)
         self.paste_btn.clicked.connect(self.paste_code)
         self.paste_explanation_btn.clicked.connect(self.paste_explanation)
         self.correct_tw.currentChanged.connect(self.correct_row_generator)
         self.copy_answer_btn.clicked.connect(self.copy_my_answer)
+        self.clear_btn.clicked.connect(self.clear_explanation)
         self.setWindowTitle(f'Проверка реворд {self.check_version()}')
 
     def check_version(self):
@@ -131,6 +129,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 print(str(e))
             return v
         return ''
+
+    def clear_explanation(self):
+        self.explanation_text = ''
+        self.explanation_pte.clear()
 
     def change_theme(self):
         if self.toggle_theme_btn.text() == 'Светлая тема':
@@ -224,7 +226,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     def set_my_answer(self):
         self.my_answer_pte.setPlainText(str(self.answer_number) + '\n<comment>\n' + self.explanation_text +
-                                        '\n<comment>')
+                                        '\n</comment>')
 
 
 def excepthook(exc_type, exc_value, exc_tb):
