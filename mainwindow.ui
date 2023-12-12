@@ -118,8 +118,8 @@
              <widget class="QPlainTextEdit" name="correct_code_pte">
               <property name="maximumSize">
                <size>
-                <width>600</width>
-                <height>1000</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="font">
@@ -226,7 +226,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>600</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
