@@ -90,6 +90,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.explanation_text = ''
         self.correct_code_model = QStandardItemModel()
         self.explanation_pte.textChanged.connect(self.explanation_changed)
         self.run_btn.clicked.connect(self.run_correct)
@@ -158,7 +159,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def explanation_changed(self):
         if len(self.task.tasks) > 0 and self.current_part is not None:
             self.task.tasks[self.current_part - 1].explanation = self.explanation_pte.toPlainText()
-            self.task.tasks[self.current_part - 1].checked = False
+
         else:
             self.task.add_part()
             self.current_part = 1
