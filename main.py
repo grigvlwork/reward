@@ -96,6 +96,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.explanation_text = ''
         self.answer_number = 0
         self.rb0.setChecked(True)
+        self.allow_spell_check = check_dict()
         self.correct_code_model = QStandardItemModel()
         self.explanation_pte.textChanged.connect(self.explanation_changed)
         self.run_btn.clicked.connect(self.run_correct)
@@ -105,6 +106,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.toggle_theme_btn.clicked.connect(self.change_theme)
         self.pep8_btn.clicked.connect(self.pep8_correct)
         self.paste_btn.clicked.connect(self.paste_code)
+        self.paste_explanation_btn.clicked.connect(self.paste_explanation)
+        self.correct_tw.currentChanged.connect(self.correct_row_generator)
+        self.setWindowTitle(f'Проверка реворд {self.check_version()}')
 
     def check_version(self):
         v = None
@@ -115,7 +119,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             print(str(e))
         if v is not None:
             try:
-                r = requests.get('https://github.com/grigvlwork/syntax123/blob/main/version.txt')
+                r = requests.get('https://github.com/grigvlwork/reward/blob/master/version.txt')
                 new_v = r.text[r.text.find("rawLines") + 12:r.text.find("rawLines") + 17]
                 if v != new_v:
                     QMessageBox.information(self,
@@ -166,11 +170,17 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             except Exception:
                 pass
 
+    def get_answer_number(self):
+        if self.rb0.isChecked():
+            return 0
+        elif self.rb1.isChecked():
+            return 1
+        return 2
+
     def explanation_changed(self):
         self.explanation_text = self.explanation_pte.toPlainText()
+        self.answer_number = self.get_answer_number()
         self.set_my_answer()
-
-
 
     def pep8_correct(self):
         self.correct_code_pte.setPlainText(self.correct_code_pte.toPlainText().replace('\t', '    '))
@@ -203,6 +213,12 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def paste_code(self):
         self.correct_code_pte.clear()
         self.correct_code_pte.appendPlainText(pyperclip.paste())
+
+    def paste_explanation(self):
+        self.explanation_pte.clear()
+        self.answer_number = 0
+        self.explanation_pte.appendPlainText(pyperclip.paste())
+        self.rb0.setChecked(True)
 
     def answer_number_change(self):
         self.answer_number = int(self.sender().text())
