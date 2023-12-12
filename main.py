@@ -20,8 +20,10 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from mainwindow import Ui_MainWindow
 import requests
 
+
 def remove_comments(code):
     return re.sub(r'#.*', '', code)
+
 
 def run_text(text, timeout):
     with open('code.py', 'w', encoding='utf-8') as c:
@@ -86,14 +88,20 @@ def check_dict():
     except Exception:
         return False
 
+
 class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.explanation_text = ''
+        self.answer_number = 0
+        self.rb0.setChecked(True)
         self.correct_code_model = QStandardItemModel()
         self.explanation_pte.textChanged.connect(self.explanation_changed)
         self.run_btn.clicked.connect(self.run_correct)
+        self.rb0.clicked.connect(self.answer_number_change)
+        self.rb1.clicked.connect(self.answer_number_change)
+        self.rb2.clicked.connect(self.answer_number_change)
         self.toggle_theme_btn.clicked.connect(self.change_theme)
 
     def check_version(self):
@@ -157,20 +165,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 pass
 
     def explanation_changed(self):
-        if len(self.task.tasks) > 0 and self.current_part is not None:
-            self.task.tasks[self.current_part - 1].explanation = self.explanation_pte.toPlainText()
+        self.explanation_text = self.explanation_pte.toPlainText()
+        self.set_my_answer()
 
-        else:
-            self.task.add_part()
-            self.current_part = 1
-            self.task.tasks[self.current_part - 1].explanation = self.explanation_pte.toPlainText()
-        self.my_answer_pte.clear()
-        self.my_answer_pte.appendPlainText(self.task.get_text())
-        if self.copy_answer_btn.isEnabled():
-            self.copy_answer_btn.setEnabled(False)
-        if self.corrected_cb.isChecked():
-            self.corrected_cb.setChecked(False)
-        self.change_icon(self.current_part, self.corrected_cb.isChecked())
+
 
     def pep8_correct(self):
         self.correct_code_pte.setPlainText(self.correct_code_pte.toPlainText().replace('\t', '    '))
@@ -203,6 +201,15 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def paste_test(self):
         self.test_pte.clear()
         self.test_pte.appendPlainText(pyperclip.paste())
+
+    def answer_number_change(self):
+        self.answer_number = int(self.sender().text())
+        self.set_my_answer()
+
+    def set_my_answer(self):
+        self.my_answer_pte.setPlainText(str(self.answer_number) + '\n<comment>\n' + self.explanation_text +
+                                        '\n<comment>')
+
 
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
