@@ -103,6 +103,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.rb1.clicked.connect(self.answer_number_change)
         self.rb2.clicked.connect(self.answer_number_change)
         self.toggle_theme_btn.clicked.connect(self.change_theme)
+        self.pep8_btn.clicked.connect(self.pep8_correct)
+        self.paste_btn.clicked.connect(self.paste_code)
 
     def check_version(self):
         v = None
@@ -198,9 +200,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.correct_code_tv.horizontalHeader().setVisible(False)
             self.correct_code_tv.resizeColumnToContents(0)
 
-    def paste_test(self):
-        self.test_pte.clear()
-        self.test_pte.appendPlainText(pyperclip.paste())
+    def paste_code(self):
+        self.correct_code_pte.clear()
+        self.correct_code_pte.appendPlainText(pyperclip.paste())
 
     def answer_number_change(self):
         self.answer_number = int(self.sender().text())
