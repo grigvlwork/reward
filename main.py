@@ -108,6 +108,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.paste_btn.clicked.connect(self.paste_code)
         self.paste_explanation_btn.clicked.connect(self.paste_explanation)
         self.correct_tw.currentChanged.connect(self.correct_row_generator)
+        self.copy_answer_btn.clicked.connect(self.copy_my_answer)
         self.setWindowTitle(f'Проверка реворд {self.check_version()}')
 
     def check_version(self):
@@ -198,6 +199,16 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.correct_code = code
 
     def copy_my_answer(self):
+        if self.allow_spell_check:
+            errors = spell_check(self.explanation_pte.toPlainText())
+            if len(errors) > 0 and self.allow_spell_check:
+                s = 'Обнаружены ошибки в тексте, всё равно скопировать?\n'
+                for err in errors:
+                    s += err[0] + ':    ' + err[1] + '\n'
+                message = QMessageBox.question(self, "Орфографические ошибки", s,
+                                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                if message != QMessageBox.Yes:
+                    return
         pyperclip.copy(self.my_answer_pte.toPlainText())
 
     def correct_row_generator(self):
