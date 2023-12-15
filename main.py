@@ -70,9 +70,11 @@ def spell_check(text):
             for word in suggestions:
                 measure = difflib.SequenceMatcher(None, w, word).ratio()
                 sim[measure] = word
-            result.append([w, sim[max(sim.keys())]])
+            try:
+                result.append([w, sim[max(sim.keys())]])
+            except Exception:
+                pass
     return result
-
 
 def check_dict():
     file1 = '/_venv/Lib/site-packages/enchant/data/mingw64/share/enchant/hunspell/ru_RU.aff'
@@ -196,7 +198,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def copy_my_answer(self):
         if self.allow_spell_check:
             errors = spell_check(self.explanation_pte.toPlainText())
-            if len(errors) > 0 and self.allow_spell_check:
+            if self.allow_spell_check and len(errors) > 0 :
                 s = 'Обнаружены ошибки в тексте, всё равно скопировать?\n'
                 for err in errors:
                     s += err[0] + ':    ' + err[1] + '\n'
