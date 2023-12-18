@@ -25,29 +25,6 @@ def remove_comments(code):
     return re.sub(r'#.*', '', code)
 
 
-def run_text(text, timeout):
-    with open('code.py', 'w', encoding='utf-8') as c:
-        c.write(text)
-    try:
-        completed_process = subprocess.run(['python', 'code.py'], capture_output=True, text=True, timeout=timeout)
-        if completed_process.returncode == 0:
-            t = completed_process.stdout
-            t = t.encode('cp1251').decode('utf-8')
-            if len(t) > 50:
-                return t[:50] + '..'
-            else:
-                return t
-        else:
-            t = completed_process.stderr
-            t = t.encode('cp1251').decode('utf-8')
-            # if len(t) > 50:
-            #     return t[:150] + '\n' + t[150:]
-            # else:
-            return t
-    except subprocess.TimeoutExpired:
-        return f'Программа выполнялась более {timeout} секунд'
-
-
 def spell_check(text):
     rus_alph = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
     words = []
@@ -76,6 +53,7 @@ def spell_check(text):
                 pass
     return result
 
+
 def check_dict():
     file1 = '/_venv/Lib/site-packages/enchant/data/mingw64/share/enchant/hunspell/ru_RU.aff'
     file2 = '/_venv/Lib/site-packages/enchant/data/mingw64/share/enchant/hunspell/ru_RU.dic'
@@ -98,6 +76,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.explanation_text = ''
+        self.result_run = ''
         self.answer_number = 0
         self.allow_spell_check = check_dict()
         self.correct_code_model = QStandardItemModel()
@@ -111,6 +90,30 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.copy_answer_btn.clicked.connect(self.copy_my_answer)
         self.clear_btn.clicked.connect(self.clear_explanation)
         self.setWindowTitle(f'Проверка реворд {self.check_version()}')
+
+    def run_text(self, text, timeout):
+        with open('code.py', 'w', encoding='utf-8') as c:
+            c.write(text)
+        try:
+            completed_process = subprocess.run(['python', 'code.py'], capture_output=True, text=True, timeout=timeout)
+            if completed_process.returncode == 0:
+                t = completed_process.stdout
+                t = t.encode('cp1251').decode('utf-8')
+                self.result_run = t
+                if len(t) > 50:
+                    return t[:50] + '..'
+                else:
+                    return t
+            else:
+                t = completed_process.stderr
+                t = t.encode('cp1251').decode('utf-8')
+                self.result_run = t
+                # if len(t) > 50:
+                #     return t[:150] + '\n' + t[150:]
+                # else:
+                return t
+        except subprocess.TimeoutExpired:
+            return f'Программа выполнялась более {timeout} секунд'
 
     def check_version(self):
         v = None
@@ -168,7 +171,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 return
         code = self.correct_code_pte.toPlainText()
         timeout = self.timeout_sb.value()
-        self.correct_output_lb.setText('Вывод: ' + run_text(remove_comments(code), timeout))
+        self.correct_output_lb.setText('Вывод: ' + self.run_text(remove_comments(code), timeout))
+        self.correct_output_lb.setToolTip(self.result_run)
         if use_file:
             try:
                 for file in glob.glob(os.getcwd() + '/' + file_name):
@@ -198,7 +202,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def copy_my_answer(self):
         if self.allow_spell_check:
             errors = spell_check(self.explanation_pte.toPlainText())
-            if self.allow_spell_check and len(errors) > 0 :
+            if self.allow_spell_check and len(errors) > 0:
                 s = 'Обнаружены ошибки в тексте, всё равно скопировать?\n'
                 for err in errors:
                     s += err[0] + ':    ' + err[1] + '\n'
