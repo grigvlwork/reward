@@ -202,14 +202,22 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def copy_my_answer(self):
         if self.allow_spell_check:
             errors = spell_check(self.explanation_pte.toPlainText())
-            if self.allow_spell_check and len(errors) > 0:
+            if self.allow_spell_check and len(errors) > 0 or self.explanation_pte.toPlainText().count('```') % 2 != 0 \
+                    or self.explanation_pte.toPlainText().count('`') % 2 != 0:
                 s = 'Обнаружены ошибки в тексте, всё равно скопировать?\n'
                 for err in errors:
                     s += err[0] + ':    ' + err[1] + '\n'
+                if self.explanation_pte.toPlainText().count('```') % 2 != 0 \
+                        or self.explanation_pte.toPlainText().count('`') % 2 != 0:
+                    s += 'Непарное количество бэктиков'
                 message = QMessageBox.question(self, "Орфографические ошибки", s,
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                 if message != QMessageBox.Yes:
                     return
+        if self.explanation_pte.toPlainText().count('```') % 2 != 0:
+            message = QMessageBox.question(self, "Ошибки", 'Непарное количество бэктиков',
+                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
         pyperclip.copy(self.my_answer_pte.toPlainText())
 
     def correct_row_generator(self):
